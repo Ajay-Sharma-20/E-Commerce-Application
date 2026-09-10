@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import Categories from "./Categories";
+import Products from "./Products";
+
 
 
 
@@ -31,18 +33,17 @@ function Home() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
-              <button
-                type="button"
+              <Link
+                to="/Products"
                 className="rounded-lg bg-primary px-6 py-3 font-semibold text-white transition hover:bg-primary-dark"
               >
                 Shop Now
-              </button>
+              </Link>
 
               <Link
               to="/Categories"
               className="rounded-lg border border-border bg-white px-6 py-3 font-semibold text-text transition hover:border-primary hover:text-primary"
             >
-              <FiUser size={18} />
               Explore Categories
             </Link>
             </div>
@@ -50,9 +51,11 @@ function Home() {
 
           {/* Hero Image Placeholder */}
           <div className="hidden h-[400px] items-center justify-center rounded-3xl bg-white shadow-sm lg:flex">
-            <span className="text-muted">
-              Hero Banner
-            </span>
+            <img
+             src="/Banner.webp"
+             alt="Cartika"
+             className="h-full w-full rounded-2xl border-s-8"
+            />
           </div>
 
         </div>
