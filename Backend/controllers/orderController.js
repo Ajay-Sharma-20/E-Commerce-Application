@@ -318,6 +318,77 @@ const getAllOrders = async (req, res) => {
 
 
 // ========================================
+// GET ORDER BY ID - ADMIN
+// ========================================
+
+const getAdminOrderById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Get order + customer
+        const [orders] = await db.query(
+            `SELECT
+                o.id,
+                o.user_id,
+                o.total_amount,
+                o.status,
+                o.shipping_address,
+                o.created_at,
+                u.name AS user_name,
+                u.email AS user_email
+             FROM orders o
+             INNER JOIN users u
+                ON o.user_id = u.id
+             WHERE o.id = ?`,
+            [id]
+        );
+
+        if (orders.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found"
+            });
+        }
+
+        // Get order items
+        const [items] = await db.query(
+            `SELECT
+                oi.id,
+                oi.product_id,
+                oi.quantity,
+                oi.price,
+                p.name AS product_name,
+                p.image
+             FROM order_items oi
+             INNER JOIN products p
+                ON oi.product_id = p.id
+             WHERE oi.order_id = ?
+             ORDER BY oi.id ASC`,
+            [id]
+        );
+
+        res.status(200).json({
+            success: true,
+            order: orders[0],
+            items
+        });
+
+    } catch (error) {
+        console.error(
+            "Get Admin Order Error:",
+            error
+        );
+
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};
+
+
+
+// ========================================
 // ADMIN - UPDATE ORDER STATUS
 // ========================================
 
@@ -417,5 +488,6 @@ module.exports = {
         getMyOrders,
         getOrderById,
         getAllOrders,
-        updateOrderStatus
+        updateOrderStatus,
+        getAdminOrderById
 };

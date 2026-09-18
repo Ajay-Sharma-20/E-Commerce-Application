@@ -1,20 +1,30 @@
 const db = require("../config/db");
 
-// ================================
+// ========================================
 // GET ALL CATEGORIES
-// ================================
+// ========================================
 
 const getCategories = async (req, res) => {
     try {
         const [categories] = await db.query(
-            `SELECT id, name, created_at
-             FROM categories
-             ORDER BY id DESC`
+            `SELECT
+                c.id,
+                c.name,
+                c.created_at,
+                COUNT(p.id) AS product_count
+             FROM categories c
+             LEFT JOIN products p
+                ON c.id = p.category_id
+                AND p.is_active = TRUE
+             GROUP BY
+                c.id,
+                c.name,
+                c.created_at
+             ORDER BY c.created_at DESC`
         );
 
         res.status(200).json({
             success: true,
-            count: categories.length,
             categories
         });
 
@@ -27,7 +37,6 @@ const getCategories = async (req, res) => {
         });
     }
 };
-
 
 // ================================
 // GET CATEGORY BY ID
@@ -199,15 +208,15 @@ const updateCategory = async (req, res) => {
 };
 
 
-// ================================
+// ========================================
 // DELETE CATEGORY
-// ================================
+// ========================================
 
 const deleteCategory = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Check category exists
+        // Check category
         const [category] = await db.query(
             `SELECT id
              FROM categories
@@ -222,7 +231,22 @@ const deleteCategory = async (req, res) => {
             });
         }
 
-        // Delete category
+        // Check products
+        const [products] = await db.query(
+            `SELECT COUNT(*) AS product_count
+             FROM products
+             WHERE category_id = ?`,
+            [id]
+        );
+
+        if (products[0].product_count > 0) {
+            return res.status(409).json({
+                success: false,
+                message:
+                    "Cannot delete category because products are assigned to it"
+            });
+        }
+
         await db.query(
             `DELETE FROM categories
              WHERE id = ?`,

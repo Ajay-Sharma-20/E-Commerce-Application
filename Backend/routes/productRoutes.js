@@ -5,7 +5,9 @@ const {
     getProductById,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getAdminProducts,
+    getAdminProductById
 } = require("../controllers/productController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -17,6 +19,23 @@ const router = express.Router();
 // Public
 
 router.get("/", getProducts);
+
+// Admin product routes
+router.get(
+    "/admin",
+    authMiddleware,
+    adminMiddleware,
+    getAdminProducts
+);
+
+router.get(
+    "/admin/:id",
+    authMiddleware,
+    adminMiddleware,
+    getAdminProductById
+);
+
+
 
 router.get("/:id", getProductById);
 
@@ -43,6 +62,8 @@ router.delete(
     adminMiddleware,
     deleteProduct
 );
+
+
 
 
 module.exports = router;

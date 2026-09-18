@@ -113,6 +113,130 @@ const getProducts = async (req, res) => {
 
 
 // ========================================
+// GET ALL PRODUCTS FOR ADMIN
+// ========================================
+
+const getAdminProducts = async (req, res) => {
+    try {
+        const {
+            search,
+            category,
+            status = "all",
+            sort = "newest",
+            page = 1,
+            limit = 10
+        } = req.query;
+
+        const pageNumber = Math.max(parseInt(page) || 1, 1);
+
+        const limitNumber = Math.min(
+            Math.max(parseInt(limit) || 10, 1),
+            100
+        );
+
+        const offset = (pageNumber - 1) * limitNumber;
+
+        let conditions = [];
+        let values = [];
+
+        // Status filter
+        if (status === "active") {
+            conditions.push("p.is_active = TRUE");
+        } else if (status === "inactive") {
+            conditions.push("p.is_active = FALSE");
+        }
+
+        // Search
+        if (search) {
+            conditions.push(
+                "(p.name LIKE ? OR p.description LIKE ?)"
+            );
+
+            const searchValue = `%${search}%`;
+
+            values.push(searchValue, searchValue);
+        }
+
+        // Category filter
+        if (category) {
+            conditions.push("p.category_id = ?");
+            values.push(category);
+        }
+
+        const whereClause =
+            conditions.length > 0
+                ? `WHERE ${conditions.join(" AND ")}`
+                : "";
+
+        // Sorting
+        let orderBy = "p.created_at DESC";
+
+        if (sort === "price_asc") {
+            orderBy = "p.price ASC";
+        } else if (sort === "price_desc") {
+            orderBy = "p.price DESC";
+        } else if (sort === "name_asc") {
+            orderBy = "p.name ASC";
+        } else if (sort === "name_desc") {
+            orderBy = "p.name DESC";
+        }
+
+        // Get products
+        const [products] = await db.query(
+            `SELECT
+                p.id,
+                p.name,
+                p.description,
+                p.price,
+                p.stock,
+                p.image,
+                p.category_id,
+                c.name AS category_name,
+                p.is_active,
+                p.created_at,
+                p.updated_at
+             FROM products p
+             INNER JOIN categories c
+                ON p.category_id = c.id
+             ${whereClause}
+             ORDER BY ${orderBy}
+             LIMIT ? OFFSET ?`,
+            [...values, limitNumber, offset]
+        );
+
+        // Get total count
+        const [countResult] = await db.query(
+            `SELECT COUNT(*) AS total
+             FROM products p
+             ${whereClause}`,
+            values
+        );
+
+        const total = countResult[0].total;
+
+        res.status(200).json({
+            success: true,
+            products,
+            pagination: {
+                page: pageNumber,
+                limit: limitNumber,
+                total,
+                totalPages: Math.ceil(total / limitNumber)
+            }
+        });
+
+    } catch (error) {
+        console.error("Get Admin Products Error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};
+
+
+// ========================================
 // GET PRODUCT BY ID
 // ========================================
 
@@ -130,6 +254,7 @@ const getProductById = async (req, res) => {
                 p.image,
                 p.category_id,
                 c.name AS category_name,
+                p.is_active,
                 p.created_at,
                 p.updated_at
              FROM products p
@@ -164,6 +289,58 @@ const getProductById = async (req, res) => {
 
 
 // ========================================
+// GET PRODUCT BY ID FOR ADMIN
+// ========================================
+
+const getAdminProductById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [products] = await db.query(
+            `SELECT
+                p.id,
+                p.name,
+                p.description,
+                p.price,
+                p.stock,
+                p.image,
+                p.category_id,
+                c.name AS category_name,
+                p.is_active,
+                p.created_at,
+                p.updated_at
+             FROM products p
+             INNER JOIN categories c
+                ON p.category_id = c.id
+             WHERE p.id = ?`,
+            [id]
+        );
+
+        if (products.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            product: products[0]
+        });
+
+    } catch (error) {
+        console.error("Get Admin Product Error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};
+
+
+
+// ========================================
 // CREATE PRODUCT
 // ========================================
 
@@ -175,7 +352,8 @@ const createProduct = async (req, res) => {
             description,
             price,
             stock,
-            image
+            image,
+            is_active
         } = req.body;
 
         // Validation
@@ -205,6 +383,17 @@ const createProduct = async (req, res) => {
             });
         }
 
+        // Validate active status
+        if (
+            is_active !== undefined &&
+            typeof is_active !== "boolean"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "is_active must be true or false"
+            });
+        }
+
         // Check category
         const [category] = await db.query(
             `SELECT id
@@ -220,18 +409,24 @@ const createProduct = async (req, res) => {
             });
         }
 
+        // If is_active is not provided,
+        // product will be active by default.
+        const activeStatus =
+            is_active === undefined ? true : is_active;
+
         // Create product
         const [result] = await db.query(
             `INSERT INTO products
-                (category_id, name, description, price, stock, image)
-             VALUES (?, ?, ?, ?, ?, ?)`,
+                (category_id, name, description, price, stock, image, is_active)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
                 category_id,
                 name.trim(),
                 description || null,
                 Number(price),
                 Number(stock),
-                image || null
+                image || null,
+                activeStatus
             ]
         );
 
@@ -442,5 +637,7 @@ module.exports = {
     getProductById,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getAdminProducts,
+    getAdminProductById
 };

@@ -1,6 +1,8 @@
 const express = require("express");
 const db = require("../config/db");
 const authMiddleware = require("../middleware/authMiddleware");
+const adminMiddleware = require("../middleware/adminMiddleware");
+const { getAllUsers, updateUserRole } = require("../controllers/userController");
 
 const router = express.Router();
 
@@ -35,5 +37,24 @@ router.get("/profile", authMiddleware, async (req, res) => {
     });
   }
 });
+
+
+// ========================================
+// ADMIN USER ROUTES
+// ========================================
+
+router.get(
+    "/admin",
+    authMiddleware,
+    adminMiddleware,
+    getAllUsers
+);
+
+router.put(
+    "/admin/:id/role",
+    authMiddleware,
+    adminMiddleware,
+    updateUserRole
+);
 
 module.exports = router;
