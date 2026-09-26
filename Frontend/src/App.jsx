@@ -1,20 +1,22 @@
 import { Routes, Route } from "react-router-dom";
 
-import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import Footer from "./components/Footer";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import Categories from "./pages/Categories";
+
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
 import Profile from "./pages/Profile";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
+import PublicLayout from "./components/PublicLayout";
+
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import ProductForm from "./pages/admin/ProductForm";
@@ -25,95 +27,143 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminOrderDetails from "./pages/admin/AdminOrderDetails";
 import AdminLayout from "./pages/admin/AdminLayout";
 
-// import { useAuth } from "./context/AuthContext";
-
-
 function App() {
-
-
-
-
   return (
-    <div className="min-h-screen">
+    <Routes>
 
-      <Navbar />
+      {/* =====================================
+          CUSTOMER / PUBLIC LAYOUT
+      ====================================== */}
 
-      <Routes>
-        <Route path="/" element={<Home />} />
+      <Route element={<PublicLayout />}>
 
-        <Route path="/products" element={<Products />} />
-        <Route path="/products/:id" element={<ProductDetails />} />
+        {/* Public Pages */}
+        <Route
+          path="/"
+          element={<Home />}
+        />
 
-        <Route path="/categories" element={<Categories />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/products"
+          element={<Products />}
+        />
 
+        <Route
+          path="/products/:id"
+          element={<ProductDetails />}
+        />
 
+        <Route
+          path="/categories"
+          element={<Categories />}
+        />
+
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+        {/* Protected Customer Pages */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
 
-          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/cart"
+            element={<Cart />}
+          />
 
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/orders/:id" element={<OrderDetails />} />
+          <Route
+            path="/checkout"
+            element={<Checkout />}
+          />
+
+          <Route
+            path="/profile"
+            element={<Profile />}
+          />
+
+          <Route
+            path="/orders"
+            element={<Orders />}
+          />
+
+          <Route
+            path="/orders/:id"
+            element={<OrderDetails />}
+          />
+
         </Route>
 
+      </Route>
 
-        <Route element={<AdminRoute />}>
-          <Route element={<AdminLayout />}>
 
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/products" element={<AdminProducts />} />
+      {/* =====================================
+          ADMIN LAYOUT
+      ====================================== */}
 
-            <Route
-              path="/admin/products/new"
-              element={<ProductForm />}
-            />
+      <Route element={<AdminRoute />}>
 
-            <Route
-              path="/admin/products/edit/:id"
-              element={<ProductForm />}
-            />
+        <Route element={<AdminLayout />}>
 
-            <Route
-              path="/admin/categories"
-              element={<AdminCategories />}
-            />
+          <Route
+            path="/admin"
+            element={<AdminDashboard />}
+          />
 
-            <Route
-              path="/admin/categories/new"
-              element={<CategoryForm />}
-            />
+          <Route
+            path="/admin/products"
+            element={<AdminProducts />}
+          />
 
-            <Route
-              path="/admin/categories/edit/:id"
-              element={<CategoryForm />}
-            />
+          <Route
+            path="/admin/products/new"
+            element={<ProductForm />}
+          />
 
-            <Route
-              path="/admin/users"
-              element={<AdminUsers />}
-            />
+          <Route
+            path="/admin/products/edit/:id"
+            element={<ProductForm />}
+          />
 
-            <Route
-              path="/admin/orders"
-              element={<AdminOrders />}
-            />
+          <Route
+            path="/admin/categories"
+            element={<AdminCategories />}
+          />
 
-            <Route
-              path="/admin/orders/:id"
-              element={<AdminOrderDetails />}
-            />
+          <Route
+            path="/admin/categories/new"
+            element={<CategoryForm />}
+          />
 
-          </Route>
+          <Route
+            path="/admin/categories/edit/:id"
+            element={<CategoryForm />}
+          />
+
+          <Route
+            path="/admin/users"
+            element={<AdminUsers />}
+          />
+
+          <Route
+            path="/admin/orders"
+            element={<AdminOrders />}
+          />
+
+          <Route
+            path="/admin/orders/:id"
+            element={<AdminOrderDetails />}
+          />
+
         </Route>
 
-      </Routes>
+      </Route>
 
-      <Footer />
-
-    </div>
+    </Routes>
   );
 }
 
