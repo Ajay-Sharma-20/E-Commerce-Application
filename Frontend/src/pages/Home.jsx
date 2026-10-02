@@ -226,248 +226,338 @@ function Home() {
       {/* =====================================
           CATEGORIES
       ====================================== */}
+      
       <section className="bg-white py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-          <div className="mb-8 flex items-end justify-between gap-4">
+    {/* Section Header */}
+    <div className="mb-9 flex items-end justify-between gap-4">
+      <div>
+        <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+          Explore Collection
+        </p>
 
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-primary">
-                Explore
-              </p>
+        <h2 className="mt-2 text-3xl font-bold tracking-tight text-text sm:text-4xl">
+          Shop by Category
+        </h2>
 
-              <h2 className="mt-2 text-3xl font-bold text-text">
-                Shop by Category
-              </h2>
+        <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
+          Explore our categories and find exactly what you're looking for.
+        </p>
+      </div>
 
-              <p className="mt-2 text-sm text-muted">
-                Find products that match what you're looking for.
-              </p>
-            </div>
+      <Link
+        to="/categories"
+        className="hidden items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-primary-dark sm:inline-flex"
+      >
+        View All
+        <FiArrowRight size={16} />
+      </Link>
+    </div>
 
-            <Link
-              to="/categories"
-              className="hidden items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-primary-dark sm:inline-flex"
-            >
-              View All
-              <FiArrowRight size={16} />
-            </Link>
+    {/* Loading */}
+    {loadingCategories ? (
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((item) => (
+          <div
+            key={item}
+            className="h-44 animate-pulse rounded-2xl bg-gray-100"
+          />
+        ))}
+      </div>
 
-          </div>
-
-          {loadingCategories ? (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-
-              {[1, 2, 3, 4].map(
-                (item) => (
-                  <div
-                    key={item}
-                    className="h-32 animate-pulse rounded-2xl bg-gray-100"
-                  />
-                )
-              )}
-
-            </div>
-          ) : categories.length === 0 ? (
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-6 py-12 text-center">
-              <FiFolder
-                size={30}
-                className="mx-auto text-gray-400"
-              />
-
-              <p className="mt-3 text-sm text-muted">
-                No categories available yet.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-
-              {categories
-                .slice(0, 8)
-                .map((category) => (
-                  <Link
-                    key={category.id}
-                    to={`/products?category=${category.id}`}
-                    className="group rounded-2xl border border-gray-100 bg-gray-50 p-5 transition hover:-translate-y-1 hover:border-primary/20 hover:bg-white hover:shadow-md"
-                  >
-
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-50 text-primary transition group-hover:bg-primary group-hover:text-white">
-                      <FiFolder size={22} />
-                    </div>
-
-                    <h3 className="mt-4 font-semibold text-text">
-                      {category.name}
-                    </h3>
-
-                    <div className="mt-2 flex items-center justify-between">
-
-                      <span className="text-xs text-muted">
-                        {Number(
-                          category.product_count || 0
-                        )}{" "}
-                        product
-                        {Number(
-                          category.product_count || 0
-                        ) !== 1
-                          ? "s"
-                          : ""}
-                      </span>
-
-                      <FiArrowRight
-                        size={15}
-                        className="text-gray-400 transition group-hover:translate-x-1 group-hover:text-primary"
-                      />
-
-                    </div>
-
-                  </Link>
-                ))}
-
-            </div>
-          )}
-
-          <Link
-            to="/categories"
-            className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary sm:hidden"
-          >
-            View All Categories
-            <FiArrowRight size={16} />
-          </Link>
-
+    /* Empty State */
+    ) : categories.length === 0 ? (
+      <div className="rounded-2xl border border-gray-100 bg-gray-50 px-6 py-14 text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-gray-400 shadow-sm">
+          <FiFolder size={26} />
         </div>
-      </section>
+
+        <p className="mt-4 text-sm font-medium text-text">
+          No categories available yet.
+        </p>
+
+        <p className="mt-1 text-xs text-muted">
+          Categories will appear here once they are added.
+        </p>
+      </div>
+
+    /* Categories */
+    ) : (
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {categories.slice(0, 8).map((category) => {
+          const productCount = Number(category.product_count || 0);
+
+          return (
+            <Link
+              key={category.id}
+              to={`/products?category=${category.id}`}
+              className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 p-5 transition duration-300 hover:-translate-y-1 hover:border-primary/20 hover:bg-white hover:shadow-lg"
+            >
+              {/* Decorative Circle */}
+              <div className="absolute -right-7 -top-7 h-24 w-24 rounded-full bg-teal-50 transition duration-300 group-hover:scale-125" />
+
+              {/* Icon */}
+              <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-primary shadow-sm transition duration-300 group-hover:bg-primary group-hover:text-white">
+                <FiFolder size={24} />
+              </div>
+
+              {/* Content */}
+              <div className="relative mt-5">
+                <h3 className="truncate text-base font-bold text-text">
+                  {category.name}
+                </h3>
+
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-xs text-muted">
+                    {productCount}{" "}
+                    {productCount === 1 ? "Product" : "Products"}
+                  </span>
+
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-gray-400 shadow-sm transition duration-300 group-hover:bg-primary group-hover:text-white">
+                    <FiArrowRight
+                      size={14}
+                      className="transition-transform duration-300 group-hover:translate-x-0.5"
+                    />
+                  </span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    )}
+
+    {/* Mobile View All */}
+    <Link
+      to="/categories"
+      className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-primary-dark sm:hidden"
+    >
+      View All Categories
+      <FiArrowRight size={16} />
+    </Link>
+
+  </div>
+</section>
 
 
       {/* =====================================
           LATEST PRODUCTS
       ====================================== */}
+      
       <section className="bg-surface py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-          <div className="mb-8 flex items-end justify-between gap-4">
+    {/* Header */}
+    <div className="mb-9 flex items-end justify-between gap-4">
+      <div>
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-primary" />
 
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-primary">
-                New Arrivals
-              </p>
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+            New Arrivals
+          </p>
+        </div>
 
-              <h2 className="mt-2 text-3xl font-bold text-text">
-                Latest Products
-              </h2>
+        <h2 className="mt-2 text-3xl font-bold tracking-tight text-text sm:text-4xl">
+          Latest Products
+        </h2>
 
-              <p className="mt-2 text-sm text-muted">
-                Check out the newest products added to Cartika.
-              </p>
+        <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
+          Fresh products recently added to our collection.
+        </p>
+      </div>
+
+      {/* Desktop View All */}
+      <Link
+        to="/products"
+        className="hidden items-center gap-2 rounded-lg border border-border bg-white px-4 py-2.5 text-sm font-semibold text-text transition hover:border-primary hover:text-primary sm:inline-flex"
+      >
+        View All Products
+        <FiArrowRight size={16} />
+      </Link>
+    </div>
+
+    {/* Loading State */}
+    {loadingProducts ? (
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((item) => (
+          <div
+            key={item}
+            className="overflow-hidden rounded-2xl border border-border bg-white"
+          >
+            {/* Image Skeleton */}
+            <div className="aspect-square animate-pulse bg-gray-100" />
+
+            {/* Content Skeleton */}
+            <div className="space-y-3 p-4">
+              <div className="h-3 w-1/3 animate-pulse rounded bg-gray-100" />
+
+              <div className="h-5 w-4/5 animate-pulse rounded bg-gray-100" />
+
+              <div className="h-4 w-1/2 animate-pulse rounded bg-gray-100" />
+
+              <div className="mt-4 h-10 animate-pulse rounded-lg bg-gray-100" />
             </div>
-
-            <Link
-              to="/products"
-              className="hidden items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-primary-dark sm:inline-flex"
-            >
-              View All
-              <FiArrowRight size={16} />
-            </Link>
-
           </div>
+        ))}
+      </div>
 
-          {loadingProducts ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    /* Empty State */
+    ) : latestProducts.length === 0 ? (
+      <div className="rounded-2xl border border-border bg-white px-6 py-16 text-center shadow-sm">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-primary">
+          <FiBox size={28} />
+        </div>
 
-              {[1, 2, 3, 4].map(
-                (item) => (
-                  <div
-                    key={item}
-                    className="overflow-hidden rounded-2xl border border-gray-100 bg-white"
-                  >
-                    <div className="aspect-square animate-pulse bg-gray-100" />
+        <h3 className="mt-5 text-lg font-semibold text-text">
+          No products available
+        </h3>
 
-                    <div className="space-y-3 p-4">
-                      <div className="h-4 animate-pulse rounded bg-gray-100" />
-                      <div className="h-4 w-2/3 animate-pulse rounded bg-gray-100" />
-                      <div className="h-8 animate-pulse rounded bg-gray-100" />
-                    </div>
-                  </div>
-                )
-              )}
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted">
+          New products will appear here as soon as they are added
+          to the store.
+        </p>
 
+        <Link
+          to="/products"
+          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+        >
+          Browse Products
+          <FiArrowRight size={16} />
+        </Link>
+      </div>
+
+    /* Products */
+    ) : (
+      <>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {latestProducts.map((product) => (
+            <div
+              key={product.id}
+              className="group relative"
+            >
+              {/* New Badge */}
+              <div className="pointer-events-none absolute left-3 top-3 z-10">
+                <span className="rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">
+                  New
+                </span>
+              </div>
+
+              <ProductCard product={product} />
             </div>
-          ) : latestProducts.length === 0 ? (
-            <div className="rounded-2xl border border-gray-100 bg-white px-6 py-12 text-center">
+          ))}
+        </div>
 
-              <FiBox
-                size={30}
-                className="mx-auto text-gray-400"
-              />
-
-              <p className="mt-3 text-sm text-muted">
-                No products available yet.
-              </p>
-
-              <Link
-                to="/products"
-                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
-              >
-                Browse Products
-                <FiArrowRight size={16} />
-              </Link>
-
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-
-              {latestProducts.map(
-                (product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                  />
-                )
-              )}
-
-            </div>
-          )}
-
+        {/* Bottom CTA */}
+        <div className="mt-10 flex justify-center">
           <Link
             to="/products"
-            className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary sm:hidden"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-6 py-3 text-sm font-semibold text-text transition hover:border-primary hover:text-primary"
           >
-            View All Products
-            <FiArrowRight size={16} />
+            Explore All Products
+            <FiArrowRight
+              size={16}
+              className="transition-transform group-hover:translate-x-1"
+            />
           </Link>
-
         </div>
-      </section>
+      </>
+    )}
 
+    {/* Mobile View All */}
+    <Link
+      to="/products"
+      className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary sm:hidden"
+    >
+      View All Products
+      <FiArrowRight size={16} />
+    </Link>
+
+  </div>
+</section>
 
       {/* =====================================
           PROMOTIONAL CTA
       ====================================== */}
-      <section className="bg-primary py-16">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+    
+    <section className="relative overflow-hidden bg-primary py-20">
+  {/* Decorative Background */}
+  <div className="absolute -left-24 -top-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+  <div className="absolute -bottom-32 -right-20 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
 
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-white">
-            <FiShoppingBag size={26} />
-          </div>
+  <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-3xl text-center">
 
-          <h2 className="mt-6 text-3xl font-bold text-white sm:text-4xl">
-            Find something you'll love.
-          </h2>
+      {/* Icon */}
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 text-white ring-1 ring-white/20">
+        <FiShoppingBag size={28} />
+      </div>
 
-          <p className="mx-auto mt-4 max-w-2xl leading-7 text-white/80">
-            Browse our collection and discover products
-            made for your everyday needs.
-          </p>
+      {/* Small Label */}
+      <p className="mt-6 text-sm font-semibold uppercase tracking-[0.18em] text-white/80">
+        Start Your Shopping Journey
+      </p>
 
-          <Link
-            to="/products"
-            className="mt-8 inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-primary shadow-sm transition hover:bg-gray-100"
-          >
-            Start Shopping
-            <FiArrowRight size={17} />
-          </Link>
+      {/* Heading */}
+      <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+        Find something
+        <span className="block text-white/90">
+          you'll love.
+        </span>
+      </h2>
 
-        </div>
-      </section>
+      {/* Description */}
+      <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">
+        Explore our collection of quality products and discover
+        something perfect for your everyday needs.
+      </p>
+
+      {/* CTA */}
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <Link
+          to="/products"
+          className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3.5 text-sm font-bold text-primary shadow-lg transition hover:-translate-y-0.5 hover:bg-gray-50"
+        >
+          Start Shopping
+          <FiArrowRight size={17} />
+        </Link>
+
+        <Link
+          to="/categories"
+          className="inline-flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15"
+        >
+          Explore Categories
+        </Link>
+      </div>
+
+      {/* Trust Points */}
+      <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-white/70">
+        <span className="flex items-center gap-2">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/15 text-white">
+            ✓
+          </span>
+          Quality Products
+        </span>
+
+        <span className="flex items-center gap-2">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/15 text-white">
+            ✓
+          </span>
+          Easy Ordering
+        </span>
+
+        <span className="flex items-center gap-2">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/15 text-white">
+            ✓
+          </span>
+          Secure Shopping
+        </span>
+      </div>
+
+    </div>
+  </div>
+</section>
 
     </main>
   );
